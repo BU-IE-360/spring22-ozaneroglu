@@ -9,6 +9,6 @@
 ### HW2
 
 
-[link]https://moodle.boun.edu.tr
+[link](https://moodle.boun.edu.tr)
 
 
