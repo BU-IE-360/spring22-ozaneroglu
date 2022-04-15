@@ -1,4 +1,4 @@
-## Welcome to Ozan Pages
+## Welcome to Ozan's Pages
 
 
 ### HW1
