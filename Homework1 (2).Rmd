@@ -3,7 +3,7 @@ title: "IE 360 HW 1"
 output: html_document
 ---
 ##    1) Introduction
-  I wanted to investigate the effect of money supply increase on food prices and the effect of increase in food prices on the volume of foreign currencies at the bank depoists. My hyp?ohesis is Increase in the money supply improve the consumption demand, increase in the conumptions demand increase the price of goods and services (infliation). Inflation causes the lower the value of national currency against foreign currency, economic un?ts hold foreign currency deposit in order to protect their purchasing power. So, volume of foreign currency depists should be rising with such trend of monney supply. I have gathered monney supply(m2), food prices index and foreign currency deposits in ord?r to investigate my assumption. I also took the  " kira artýþý" search volumes by google trends, I think that is also highly corralated with the price index.
+  I wanted to investigate the effect of money supply increase on food prices and the effect of increase in food prices on the volume of foreign currencies at the bank depoists. My hyp?ohesis is Increase in the money supply improve the consumption demand, increase in the conumptions demand increase the price of goods and services (infliation). Inflation causes the lower the value of national currency against foreign currency, economic un?ts hold foreign currency deposit in order to protect their purchasing power. So, volume of foreign currency depists should be rising with such trend of monney supply. I have gathered monney supply(m2), food prices index and foreign currency deposits in ord?r to investigate my assumption. I also took the  " kira artÃ½Ã¾Ã½" search volumes by google trends, I think that is also highly corralated with the price index.
   
   
   
@@ -51,9 +51,9 @@ str(money_supply)
 ```{r pressure, echo=FALSE}
 money_supply=data.table(money_supply)
 ggplot(money_supply,aes(Date,Money_Supply, group=1)) + geom_line(data = money_supply, color="blue", line?ype = "solid",size=1) +
-ggtitle("Monney Supply") +
+ggtitle("Money Supply") +
 xlab("Date (Monthly)") + 
-ylab("Closing Price") +
+ylab("Money Supply") +
 theme_linedraw()
 
 ```
@@ -72,7 +72,7 @@ ggplot(money_supply, aes(Money_Supply))+geom_histogram(alpha=0.6,bins=26,aes(fil
 
 
 ###    2.3) Food Prices
- Food prices is one of important the sub-ýndex of customer price index.
+ Food prices is one of important the sub-Ã½ndex of customer price index.
 
 ```{r pressure, echo=FALSE}
 food_price=data.table(food_price)
@@ -128,7 +128,7 @@ google_data=data.table(google_data)
 ggplot(google_data,aes(Date,search_volume, group=1)) + geom_line(data = google_data, color="purple", linetype = "solid", size= 2) +
 ggtitl?("Google Search Volume") +
 xlab("Date (Monthly)") + 
-ylab("  *kira artýþý* Search Volume") +
+ylab("  *kira artÃ½Ã¾Ã½* Search Volume") +
 theme_linedraw()
 
 ```
@@ -159,4 +159,4 @@ ggpairs(sumdata)
 ?``
 
 ##    3) Conclusion
- This corralation values shows that all food price index, money supply and foreign currency bank deposits strongly corralated with each other. Desptite these statistical analysis, economic view of the story also proves the strong re?ationship between these topics. However, there is no significant relation with the search term "kira artýþý" with the corraleted datas from EVDS. Annual announcments of the customer price index and renting contracts could be the reasons fot the weak corral?tion.
+ This corralation values shows that all food price index, money supply and foreign currency bank deposits strongly corralated with each other. Desptite these statistical analysis, economic view of the story also proves the strong re?ationship between these topics. However, there is no significant relation with the search term "kira artÃ½Ã¾Ã½" with the corraleted datas from EVDS. Annual announcments of the customer price index and renting contracts could be the reasons fot the weak corral?tion.
