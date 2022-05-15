@@ -1,0 +1,245 @@
+
+---
+title: "Ozan Eroğlu IE 360- HW2"
+output: html_document
+---
+`
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+```{r setup, echo=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+library(RcppRoll)
+library(zoo)
+library(dplyr)
+require(data.table)
+require(cleaner)
+require(lubridate)
+require(astsa)
+require(zoo)
+require(forecast)
+require(ggplot2)
+require(GGally)
+############# Reading and processing datas ##########
+data_path="C:/Users/OZAN/Desktop/IE360_Spring22_HW2_data.csv"
+hwdata=read.csv(data_path)
+hwdata$Unleaded.Gasoline.Sale..UGS. = gsub( " ", "", hwdata$Unleaded.Gasoline.Sale..UGS. )
+hwdata$Unleaded.Gasoline.Sale..UGS. = as.numeric(hwdata$Unleaded.Gasoline.Sale..UGS.)
+hwdata$X..LPG.Vehicles..NLPG. = gsub( " ", "", hwdata$X..LPG.Vehicles..NLPG. )
+hwdata$X..LPG.Vehicles..NLPG. = as.numeric(hwdata$X..LPG.Vehicles..NLPG)
+hwdata$X..Unleaded.Gasoline.Vehicles..NUGV. = gsub( " ", "", hwdata$X..Unleaded.Gasoline.Vehicles..NUGV. )
+hwdata$X..Unleaded.Gasoline.Vehicles..NUGV. = as.numeric(hwdata$X..Unleaded.Gasoline.Vehicles..NUGV.)
+hwdata$Price.of.Unleaded.Gasoline..PU. = gsub( " ", "", hwdata$Price.of.Unleaded.Gasoline..PU. )
+hwdata$Price.of.Unleaded.Gasoline..PU. = as.numeric(hwdata$Price.of.Unleaded.Gasoline..PU.)
+hwdata$GNP.Agriculture = gsub( " ", "", hwdata$GNP.Agriculture )
+hwdata$GNP.Agriculture = as.numeric(hwdata$GNP.Agriculture)
+hwdata$GNP.Commerce = gsub( " ", "", hwdata$GNP.Commerce )
+hwdata$GNP.Commerce = as.numeric(hwdata$GNP.Commerce)
+hwdata$GNP.Total = gsub( " ", "", hwdata$GNP.Total )
+hwdata$GNP.Total = as.numeric(hwdata$GNP.Total)
+hwdata$Quarter = as.character(hwdata$Quarter)
+hwdata = data.table(hwdata)
+head(hwdata,25)
+str(hwdata)
+```
+
+
+## Time Series of UGS Comments on Shape and Trend 
+
+
+```{r 1, echo=TRUE}
+hwdata$Unleaded.Gasoline.Sale..UGS. = ts(hwdata$Unleaded.Gasoline.Sale..UGS., start = 2000)
+ggplot(hwdata, aes(Quarter,Unleaded.Gasoline.Sale..UGS. , group=1)) + geom_line() +geom_point()
+```
+
+```{r 21, echo=TRUE}
+mean_series=roll_mean(hwdata$Unleaded.Gasoline.Sale..UGS.,5,align='left')
+var_series=roll_var(hwdata$Unleaded.Gasoline.Sale..UGS.,5,align='left')
+plot(mean_series,
+      type='l',
+     xlab = " (t)",
+     ylab = "R Mean",
+     main = "Mean ")
+
+plot(var_series,
+     type='l',col='BLUE',
+     xlab = " (t)",
+     ylab = "Rolling Variance",
+     main = "Variance ")
+```
+
+
+The plot of the time series shows a decraesing trend and seasonailty. About stainoratiy, the mean were decresing with the time series and varianve term of seasonality also shrinking.We could determine that probably there is a model which could be used to make future predictions with the data. So, time series data of the UGS (Unleaded Gasoline Sales) is not stationary.
+
+## Autocorrelation of UGS data 
+
+```{r 2, echo=TRUE}
+acf(hwdata$Unleaded.Gasoline.Sale..UGS.[0:28], lag.max = 12) 
+```
+
+
+
+Autocorralation function shows that there is a high autocorrelation with lag 4.Time interval between each peak is 4.
+
+
+## Adding Seasonality and Trend data
+
+
+
+
+```{r}
+hwdata[,trend:=1:.N]
+quarter=seq(1,4,by=1)
+hwdata[,seasonality:=((1:.N)%%4)] # remainder from 4. 4th quarters are represented with "0".
+hwdata[seasonality == 0, seasonality := 4]
+hwdata$seasonality = as.factor(hwdata$seasonality) # Taking seasonality as factor
+str(hwdata)
+summary(hwdata)
+```
+
+
+```{r   66}
+fit <- lm(Unleaded.Gasoline.Sale..UGS.~trend+as.factor(seasonality) -seasonality, data = hwdata) 
+summary(fit)
+checkresiduals(fit)
+```
+
+##  Regression Models
+
+Correlation matrix will give us some insgiths about the sales data. Any correlation will help us in our model.
+```{r 455, echo=TRUE}
+ggpairs(hwdata[,-1,with=FALSE]) 
+```
+correlations between variables shows that X..Unleaded.Gasoline.Vehicles..NUGV.and X..LPG.Vehicles..NLPG.have relations wihich could be described in the model. 
+
+Building the model step by step:
+
+Base Model:
+```{r 40, echo=TRUE}
+fit= lm(Unleaded.Gasoline.Sale..UGS.~trend ,hwdata)
+summary(fit)
+checkresiduals(fit) # There's high autocorrelation with lag 2 and 4's
+```
+
+
+
+Let's start to add the variables to the model respectively with their correlation with our output variables to increase the performance (Adj R^2) of the model and drop the insignificant variables.
+
+
+```{r 42, echo=TRUE}
+fit <- lm(Unleaded.Gasoline.Sale..UGS.~trend+as.factor(seasonality) -seasonality, data = hwdata)
+summary(fit)
+checkresiduals(fit)
+
+
+
+```
+
+After adding seasonality we investigate a hisgh autocorrelation. In order to understand the effect we will examine seperartly and combined with other variables in our model.
+```{r 421, echo=TRUE}
+setDT(hwdata)
+
+
+hwdata[,.(two_lagged_sales = shift(hwdata$Unleaded.Gasoline.Sale..UGS., n=2L, fill=NA))]
+hwdata$two_lagged_sales = hwdata[,.(two_lagged_sales = shift(hwdata$Unleaded.Gasoline.Sale..UGS., n=2L, fill=NA))]
+```
+
+```{r   55}
+fit <- lm(Unleaded.Gasoline.Sale..UGS.~trend+as.factor(seasonality)
++two_lagged_sales, hwdata)
+summary(fit)
+checkresiduals(fit$residual)
+```
+We observe a sligth significance with lag2.
+
+
+
+Adding corralated variables obsewrved with the ggpairs function model to investigate under t test.
+
+```{r   44}
+fit <- lm(Unleaded.Gasoline.Sale..UGS.~trend+as.factor(seasonality)+
++X..LPG.Vehicles..NLPG. 
++X..Unleaded.Gasoline.Vehicles..NUGV., hwdata)
+summary(fit)
+checkresiduals(fit)
+```
+NUGV variable has non-significance as the T-Tes shows so I will drop the variable.
+```{r  32}
+fit <- lm(Unleaded.Gasoline.Sale..UGS.~trend+as.factor(seasonality)
++X..LPG.Vehicles..NLPG., data = hwdata)
+summary(fit)
+checkresiduals(fit)
+```
+Adjusted r-square incresed due to drop off 
+```{r   22}
+fit <- lm(Unleaded.Gasoline.Sale..UGS.~trend+as.factor(seasonality)+
++X..LPG.Vehicles..NLPG.+ ( X..of.Diesel.Gasoline.Vehicles..NDGV.)^2, data = hwdata)
+summary(fit)
+checkresiduals(fit)
+```
+No significance differences on R-adhusted square so dropp of the NLPG variable
+
+
+
+```{r  11}
+
+summary(hwdata)
+```
+
+At these step we can combine the two effect which helped us the model and dropp the insignficant variables. Examine the autocorrelation and residual plots to determine if our model enough to explain current data set.
+
+
+
+
+
+
+
+
+```{r 45, echo=TRUE}
+fit= lm(Unleaded.Gasoline.Sale..UGS.~trend + seasonality 
+            + Price.of.Diesel.Gasoline..PG.+two_lagged_sales, hwdata)
+summary(fit)
+checkresiduals(fit$residuals)
+```
+
+
+As a resulting model we can not observe heavy autocorralation with any lags. Our residuals are distributed normally with mean zero and approximitly constant variance. We can use the model for forecasting.
+
+# Adjusted R-squared:  0.9454 
+
+#p-value: 4.152e-12
+
+
+
+##  Predictions
+
+```{r 6, echo=TRUE}
+tmp=copy(hwdata)
+tmp[,actual:=Unleaded.Gasoline.Sale..UGS.]
+tmp[,predictions:=predict(fit,tmp)]
+print(tmp)
+tmp[ 30, "one_lagged_sales"] = 66210.0
+tmp[,predictions2:=predict(fit,tmp)]
+tmp[ 31, "one_lagged_sales"] = 1110417.4
+tmp[,predictions2:=predict(fit,tmp)]
+tmp[ 32, "one_lagged_sales"] = 848645.6
+tmp[,predictions2:=predict(fit,tmp)]
+```
+
+
+
+
+```{r 7, echo=TRUE}
+print(tmp$predictions2)
+ggplot(tmp ,aes(x=Quarter)) +
+  geom_line(aes(y=actual,color='real', group = 1)) + 
+  geom_line(aes(y=predictions2, color = 'predicted', group = 1) ) 
+```
+
+
+
+
+
