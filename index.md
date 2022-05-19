@@ -1,7 +1,7 @@
 ## Welcome to Ozan's Pages
 
 
-### HW1
+
 ### Homework 1
 Link for the HW1 .RMD file:
 [link](https://github.com/BU-IE-360/spring22-ozaneroglu/blob/gh-pages/360_hw_1_datas/360_hw_1.Rmd)
