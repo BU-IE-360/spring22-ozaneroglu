@@ -14,7 +14,7 @@ Link for the HW1 .RMD file:
 [link](https://github.com/BU-IE-360/spring22-ozaneroglu/blob/gh-pages/HW%202.Rmd)
 
 Link for the HW1 html file: 
-[HW_2](https://github.com/BU-IE-360/spring22-ozaneroglu/blob/gh-pages/HW-2.html)
+[HW_2](https://bu-ie-360.github.io/spring22-ozaneroglu/HW-2.html )
 
 
 
