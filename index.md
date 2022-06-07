@@ -28,7 +28,7 @@ Project HTML file:
 
 
 Project RMD file:
-[link](https://github.com/BU-IE-360/spring22-ozaneroglu/blob/gh-pages/IE360_Project_Group5--1-.Rmd)
+[link](https://bu-ie-360.github.io/spring22-ozaneroglu/IE360_Project_Group5--1-.Rmd)
 
 
 
