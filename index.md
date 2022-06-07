@@ -23,7 +23,7 @@ Link for the HW1 html file:
 ### Project 
 
 Project HTML file:
-[link](https://github.com/BU-IE-360/spring22-ozaneroglu/blob/gh-pages/IE360_Project_Group5--1-.html)
+[link](https://bu-ie-360.github.io/spring22-ozaneroglu/IE360_Project_Group5--1-.html)
 
 
 
