@@ -23,8 +23,9 @@ Link for the HW1 html file:
 ### Project 
 
 Project HTML file:
-
+[link](
 Project RMD file:
+[link](https://github.com/BU-IE-360/spring22-ozaneroglu/blob/gh-pages/IE360_Project_Group5%20(1).Rmd)
 
 
 
